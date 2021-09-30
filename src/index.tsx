@@ -1,7 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
+import { ThemeProvider } from 'providers/theme'
 
-import './index.less'
+import 'tailwindcss/tailwind.css'
+import './index.css'
 
-ReactDOM.render(<App />, document.getElementById('app'))
+ReactDOM.render(
+	<ThemeProvider>
+		<App />
+	</ThemeProvider>,
+	document.getElementById('app')
+)

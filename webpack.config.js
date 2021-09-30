@@ -1,28 +1,27 @@
 const HtmlWebPackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
-const htmlPluginConfig = new HtmlWebPackPlugin({
-	template: './src/index.html',
-	filename: './index.html'
-})
-
-const prod = process.env.NODE_ENV === 'production'
 const path = require('path')
+const glob = require('glob')
+
+// this is like setting baseUrl in tsconfig.json to './src'
+const alias = glob.sync('./src/*').reduce((a, name) => {
+	const paths = name.split('/')
+	const pathWithoutExtension = paths[paths.length - 1].split('.')[0]
+	a[pathWithoutExtension] = path.join(__dirname, name)
+	return a
+}, {})
 
 module.exports = {
+	entry: './src/index.tsx',
 	devtool: 'source-map',
-	output: {
-		filename: '[name].[contenthash].js'
-	},
 	devServer: {
 		headers: {
 			'Access-Control-Allow-Origin': '*'
 		}
 	},
 	resolve: {
-		alias: {
-			variables: path.join(__dirname, './src/assets/less/variables.less')
-		},
+		alias,
 		extensions: ['.ts', '.tsx', '.js']
 	},
 	module: {
@@ -30,35 +29,11 @@ module.exports = {
 			{
 				test: /\.tsx?$/,
 				exclude: /node_modules/,
-				use: [
-					{
-						loader: 'babel-loader'
-					}
-				]
+				use: ['babel-loader']
 			},
 			{
 				test: /\.css$/,
-				use: [prod ? MiniCssExtractPlugin.loader : 'style-loader', 'css-loader']
-			},
-			{
-				test: /\.less$/,
-				use: [
-					prod ? MiniCssExtractPlugin.loader : 'style-loader',
-					{
-						loader: 'css-loader',
-						options: {
-							sourceMap: true,
-							modules: true,
-							localIdentName: '[local]___[hash:base64:5]'
-						}
-					},
-					{
-						loader: 'less-loader',
-						options: {
-							javascriptEnabled: true
-						}
-					}
-				]
+				use: ['style-loader', 'css-loader', 'postcss-loader']
 			},
 			{
 				test: /\.(jpg|png|svg)$/,
@@ -72,5 +47,5 @@ module.exports = {
 			}
 		]
 	},
-	plugins: [htmlPluginConfig, new MiniCssExtractPlugin({ filename: '[name].css' })]
+	plugins: [new HtmlWebPackPlugin({ template: './src/index.html' }), new MiniCssExtractPlugin({ filename: '[name].css' })]
 }
