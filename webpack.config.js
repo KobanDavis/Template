@@ -20,6 +20,12 @@ module.exports = {
 			'Access-Control-Allow-Origin': '*'
 		}
 	},
+	stats: {
+		all: false,
+		errors: true,
+		warnings: true,
+		builtAt: true
+	},
 	resolve: {
 		alias,
 		extensions: ['.ts', '.tsx', '.js']
